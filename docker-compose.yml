@@ -1,0 +1,45 @@
+services:
+  portal:
+    image: mateusggtytyttrt55/agrovale-portal:1.0-26127954
+    ports:
+      - "8054:80"
+    restart: unless-stopped
+    networks:
+      - agrovale_net
+
+  db:
+    image: mariadb:11.4
+    environment:
+      MARIADB_DATABASE: ${MARIADB_DATABASE}
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+    volumes:
+      - db_dados:/var/lib/mysql
+    restart: unless-stopped
+    networks:
+      - agrovale_net
+
+  blog:
+    image: wordpress:6-apache
+    depends_on:
+      - db
+    ports:
+      - "9054:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: ${MARIADB_DATABASE}
+      WORDPRESS_DB_USER: ${MARIADB_USER}
+      WORDPRESS_DB_PASSWORD: ${MARIADB_PASSWORD}
+    volumes:
+      - blog_dados:/var/www/html
+    restart: unless-stopped
+    networks:
+      - agrovale_net
+
+networks:
+  agrovale_net:
+
+volumes:
+  db_dados:
+  blog_dados:
